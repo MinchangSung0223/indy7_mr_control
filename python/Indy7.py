@@ -38,9 +38,11 @@ class Indy7:
 
         self.data={}
         self.data["t"]=[]
-        self.data["q_rel"]=[]
-        self.data["T_rel"]=[]
+        self.data["q"]=[]
+        self.data["T"]=[]
         self.data["Xd"]=[]
+        self.data["Vb"]=[]
+        self.data["Vd"]=[]
         self.lineWidth = 4;
         self.x_lineId = p.addUserDebugLine(lineFromXYZ=[0, 0, 0],
                                     lineToXYZ=[0, 0, 0],
@@ -56,7 +58,10 @@ class Indy7:
                                     lineToXYZ=[0, 0, 0],
                                     lineColorRGB=[0,1,0],
                                     lineWidth=self.lineWidth,
-                                    lifeTime=0)                                            
+                                    lifeTime=0)     
+        self.line_x_Id_list = []                                          
+        self.line_y_Id_list = []                                          
+        self.line_z_Id_list = []                                          
 
         dt = 1.0/CONTROL_FREQ
 
@@ -154,8 +159,69 @@ class Indy7:
     def applyForce(self,force):
         #self.p.applyExternalForce(self.robotId,self.eef_num,force,[0,0,0],self.p.WORLD_FRAME)
         self.p.applyExternalForce(self.robotId,self.eef_num,force,[0,0,0],self.p.LINK_FRAME)
-    def drawEEF(self):
-        T = self.getEEFPose();    
+    def setData(self,t,q,T,Xd,Vb,Vd):
+        self.data["t"].append(t)
+        self.data["q"].append(q.tolist())
+        self.data["T"].append(T.tolist())
+        self.data["Xd"].append(Xd.tolist())
+        self.data["Vb"].append(Vb.tolist())
+        self.data["Vd"].append(Vd.tolist())
+    def saveData(self):
+        with open("output.json", 'w') as outfile:
+            json.dump(self.data, outfile)
+    def plotData(self):
+        data={}
+        with open("output.json", 'r') as file:
+            data = json.load(file)
+        t_list = np.array(data["t"])
+        q_list = np.array(data["q"])
+
+        T_list = np.array(data["T"])
+        T_x_list = T_list[:,0,3]
+        T_y_list = T_list[:,1,3]
+        T_z_list = T_list[:,2,3]
+
+        Xd_list = np.array(data["Xd"])
+        Xd_x_list = Xd_list[:,0,3]
+        Xd_y_list = Xd_list[:,1,3]
+        Xd_z_list = Xd_list[:,2,3]
+
+        Vd_list = np.array(data["Vd"])
+        Vb_list = np.array(data["Vb"])
+
+
+        #for i in range(0,12):
+        #   plt.plot(t_list,q_rel_list[:,i])
+        plt.figure()
+        plt.subplot(3,1,1)
+        plt.plot(t_list,T_x_list-Xd_x_list)
+        plt.subplot(3,1,2)
+        plt.plot(t_list,T_y_list-Xd_y_list)
+        plt.subplot(3,1,3)
+        plt.plot(t_list,T_z_list-Xd_z_list)
+        plt.tight_layout()
+        plt.figure()
+        plt.subplot(6,1,1)
+        plt.plot(t_list,Vd_list[:,0],'r:')
+        plt.plot(t_list,Vb_list[:,0])
+        plt.subplot(6,1,2)
+        plt.plot(t_list,Vd_list[:,1],'r:')
+        plt.plot(t_list,Vb_list[:,1])
+        plt.subplot(6,1,3)
+        plt.plot(t_list,Vd_list[:,2],'r:')
+        plt.plot(t_list,Vb_list[:,2])
+        plt.subplot(6,1,4)
+        plt.plot(t_list,Vd_list[:,3],'r:')
+        plt.plot(t_list,Vb_list[:,3])
+        plt.subplot(6,1,5)
+        plt.plot(t_list,Vd_list[:,4],'r:')
+        plt.plot(t_list,Vb_list[:,4])
+        plt.subplot(6,1,6)
+        plt.plot(t_list,Vd_list[:,5],'r:')
+        plt.plot(t_list,Vb_list[:,5])
+        plt.tight_layout()        
+        plt.show()    
+    def drawT(self,T,lineWidth,x_lineId,y_lineId,z_lineId,scale):
         line_p = T[0:3,3];
         line_px = T@np.array([0.1,0,0,1]).T
         line_py = T@np.array([0.0,0.1,0,1]).T
@@ -166,22 +232,51 @@ class Indy7:
         line_pz = [line_pz[0],line_pz[1],line_pz[2]]
         p.addUserDebugLine(lineFromXYZ=line_p,
                                lineToXYZ=line_px,
-                               lineColorRGB=[1,0,0],
-                               lineWidth=self.lineWidth,
+                               lineColorRGB=[1/scale,0,0],
+                               lineWidth=lineWidth,
                                lifeTime=0,
-                               replaceItemUniqueId=self.x_lineId)
+                               replaceItemUniqueId=x_lineId)
         p.addUserDebugLine(lineFromXYZ=line_p,
                                lineToXYZ=line_py,
-                               lineColorRGB=[0,1,0],
-                               lineWidth=self.lineWidth,
+                               lineColorRGB=[0,1/scale,0],
+                               lineWidth=lineWidth,
                                lifeTime=0,
-                               replaceItemUniqueId=self.y_lineId)
+                               replaceItemUniqueId=y_lineId)
         p.addUserDebugLine(lineFromXYZ=line_p,
                                lineToXYZ=line_pz,
-                               lineColorRGB=[0,0,1],
-                               lineWidth=self.lineWidth,
+                               lineColorRGB=[0,0,1/scale],
+                               lineWidth=lineWidth,
                                lifeTime=0,
-                               replaceItemUniqueId=self.z_lineId)
+                               replaceItemUniqueId=z_lineId)
+    def drawEEF(self):
+        T = self.getEEFPose();
+        self.drawT(T,self.lineWidth,self.x_lineId,self.y_lineId,self.z_lineId,1);
+    def drawTrajectory(self,Xd_list,Num):
+        for idx in range(0,len(Xd_list),int(len(Xd_list)/Num)):
+            T = Xd_list[idx];
+            line_p = T[0:3,3];
+            line_px = T@np.array([0.1,0,0,1]).T
+            line_py = T@np.array([0.0,0.1,0,1]).T
+            line_pz = T@np.array([0.0,0,0.1,1]).T
+            line_p = [line_p[0],line_p[1],line_p[2]]
+            line_px = [line_px[0],line_px[1],line_px[2]]
+            line_py = [line_py[0],line_py[1],line_py[2]]
+            line_pz = [line_pz[0],line_pz[1],line_pz[2]]
+            p.addUserDebugLine(lineFromXYZ=line_p,
+                                   lineToXYZ=line_px,
+                                   lineColorRGB=[1,0,0],
+                                   lineWidth=1,
+                                   lifeTime=0)
+            p.addUserDebugLine(lineFromXYZ=line_p,
+                                   lineToXYZ=line_py,
+                                   lineColorRGB=[0,1,0],
+                                   lineWidth=1,
+                                   lifeTime=0)
+            p.addUserDebugLine(lineFromXYZ=line_p,
+                                   lineToXYZ=line_pz,
+                                   lineColorRGB=[0,0,1],
+                                   lineWidth=1,
+                                   lifeTime=0)
     def setTorques(self,torques):
         for i in range(len(self.active_joint_num_list)):
             self.p.setJointMotorControl2(self.robotId, self.active_joint_num_list[i], self.p.TORQUE_CONTROL ,force=torques[i])  

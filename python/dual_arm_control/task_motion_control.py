@@ -31,7 +31,7 @@ Pos_Kp = 20.0
 Pos_Kd = Pos_Kp/50.0;
 Pos_Ki = Pos_Kp/100.0;
 Xe_rel_sum = np.array([0,0,0,0,0,0]).T
-  
+
 for t in np.arange(0,endTime,dt):
 
 	q_r,qdot_r = indy_r.getJointStates();
