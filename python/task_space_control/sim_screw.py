@@ -71,11 +71,9 @@ for t in np.arange(0,endTime,dt):
 	Js,Jb,Ja,pinvJs,pinvJb, pinvJa = indy7.getJacobian(M,Slist,Blist,q);
 	Vb = Jb @ qdot;
 	Va = Ja @ qdot;
-	#Xe= np.r_[so3ToVec(MatrixLog3(R.T@Rd)),np.array(pd-p).T]
 	diffXd =se3ToVec(MatrixLog6(TransInv(prevXd)@ Xd))
 	diffXd_list.append(diffXd);
 	Xe = se3ToVec(MatrixLog6(TransInv(T)@ Xd))
-	#qdot = pinvJa@np.r_[np.c_[R.T @Rd ,np.zeros([3,3])],np.c_[np.zeros([3,3]),np.eye(3)]] @ Vd +Kp*pinvJa@Xe
 	qdot = pinvJb@Adjoint(TransInv(T)@Xd)@Vd*10+Kp*pinvJb@Xe
 	q,qdot = EulerStep(q,qdot,qddot,dt)
 	prevXd = Xd;
