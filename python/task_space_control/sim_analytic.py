@@ -40,8 +40,8 @@ print(Xstart)
 theta = pi/3.0
 Xend = RpToTrans(Xstart[0:3,0:3] @ EulerXYZ(theta,theta,-theta), pstart+np.array([0.1,0.1,0.1]))
 print(Xend)
-Xd_list = ScrewTrajectory(Xstart, Xend, endTime, int(endTime/dt), 5,type=0)
-Vd_list = ScrewTrajectory(Xstart, Xend, endTime, int(endTime/dt), 5,type=1)
+Xd_list = CartesianTrajectory(Xstart, Xend, endTime, int(endTime/dt), 5,type=0)
+Vd_list = CartesianTrajectory(Xstart, Xend, endTime, int(endTime/dt), 5,type=1)
 
 data={}
 data["Xd_list"]=[]
@@ -70,13 +70,11 @@ for t in np.arange(0,endTime,dt):
 	Rd,pd = TransToRp(Xd);
 	Js,Jb,Ja,pinvJs,pinvJb, pinvJa = indy7.getJacobian(M,Slist,Blist,q);
 	Vb = Jb @ qdot;
-	Va = Ja @ qdot;
-	#Xe= np.r_[so3ToVec(MatrixLog3(R.T@Rd)),np.array(pd-p).T]
+	Xe= np.r_[so3ToVec(MatrixLog3(R.T@Rd)),np.array(pd-p).T]
 	diffXd =se3ToVec(MatrixLog6(TransInv(prevXd)@ Xd))
 	diffXd_list.append(diffXd);
-	Xe = se3ToVec(MatrixLog6(TransInv(T)@ Xd))
-	#qdot = pinvJa@np.r_[np.c_[R.T @Rd ,np.zeros([3,3])],np.c_[np.zeros([3,3]),np.eye(3)]] @ Vd +Kp*pinvJa@Xe
-	qdot = pinvJb@Adjoint(TransInv(T)@Xd)@Vd*10+Kp*pinvJb@Xe
+	Vd[3:6] = R.T@Vd[3:6] 
+	qdot = pinvJb@Vd*10 + Kp*pinvJa@Xe
 	q,qdot = EulerStep(q,qdot,qddot,dt)
 	prevXd = Xd;
 	idx= idx+1
@@ -86,18 +84,3 @@ for t in np.arange(0,endTime,dt):
 	indy7.step()
 indy7.saveData();
 indy7.plotData();
-'''
-import matplotlib.pyplot as plt
-diffXd_list =np.array(diffXd_list);
-Vd_list = np.array(Vd_list)
-print(diffXd_list.shape)
-print(Vd_list.shape)
-t_list = np.linspace(0,endTime,int(endTime/dt))
-print(Xstart)
-print(Xend)
-for i in range(0,6):
-	plt.subplot(6,1,i+1)
-	plt.plot(t_list,Vd_list[:,i],"r--")
-	plt.plot(t_list,diffXd_list[:,i],"b:")
-plt.show()
-'''
