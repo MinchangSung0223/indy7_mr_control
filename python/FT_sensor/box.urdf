@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<robot name="box" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <material name="yellow">
+    <color rgba="1 1 0 0.5"/>
+  </material>  
+  <material name="red">
+    <color rgba="0.7 0.7 0.7 0.5"/>
+  </material>    
+  <link name="world"/>
+	<link name="box_link">
+		<inertial>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<mass value="0" />
+			<inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0" iyz="0" ixz="0"/>
+		</inertial>
+		<visual>
+			<origin rpy="0 0 0.0" xyz="0 0 0"/>
+			<geometry>
+				<cylinder radius="0.1" length="0.001"/>
+			</geometry>
+		<material name="yellow"/>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0.0" xyz="0 0 0"/>
+			<geometry>
+				<cylinder radius="0.1" length="0.001"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="sensor_link">
+		<inertial>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<mass value="1" />
+			<inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0" iyz="0" ixz="0"/>
+		</inertial>
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0.125"/>
+			<geometry>
+				<box size="1 1 0.25"/>
+			</geometry>
+		<material name="red"/>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0 0 0.125"/>
+			<geometry>
+				<box size="1 1 0.25"/>
+			</geometry>
+		</collision>
+	</link>	
+<joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="box_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+  </joint>
+
+  <joint name="sensor_joint" type="floating">
+    <parent link="box_link"/>
+    <child link="sensor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.000"/>
+  </joint>
+</robot>

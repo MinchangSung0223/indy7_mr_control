@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<robot name="Arm">
+<material name="metal_gray">
+	<color rgba="0.7 0.7 0.7 1"/>
+</material>
+<material name="yellow">       
+	<color rgba="0.7 0.7 0  1"/>
+</material>  
+<material name="white">
+	<color rgba="1 1 1 0.5"/>
+</material>
+<material name="red">
+	<color rgba="1 0 0 0.1"/>
+</material>
+<material name="minus_red">
+	<color rgba="1 0 0 0.1"/>
+</material>
+<material name="green">
+	<color rgba="0 1 0 0.1"/>
+</material>
+<material name="minus_green">
+	<color rgba="0 1 0 0.1"/>
+</material>
+<material name="blue">
+	<color rgba="0 0 1 0.1"/>
+</material>
+<material name="minus_blue">
+	<color rgba="0 0 1 0.1"/>
+</material>
+  <link name="world"/>
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.00" ixy="0.0" ixz="0.0" iyy="0.00" iyz="0.0" izz="0.00"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="10 10 0.001"/>
+      </geometry>
+      <origin xyz="0.0 0.0 -0.0005" rpy="0 0.0 0.0"/>
+      <material name="white"/>
+    </visual>
+   
+    <collision>
+      <geometry>
+        <box size="10 10 0.001"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.005" rpy="0 0.0 0.0"/>
+    </collision> 
+  </link>
+  <link name="x_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.00" ixy="0.0" ixz="0.0" iyy="0.00" iyz="0.0" izz="0.00"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="5 0.01 0.01"/>
+      </geometry>
+      <origin xyz="2.5 0.0 0" rpy="0 0.0 0.0"/>
+      <material name="red"/>
+    </visual>
+  </link>
+  <link name="minus_x_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.00" ixy="0.0" ixz="0.0" iyy="0.00" iyz="0.0" izz="0.00"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="5 0.01 0.01"/>
+      </geometry>
+      <origin xyz="-2.5 0.0 0" rpy="0 0.0 0.0"/>
+      <material name="minus_red"/>
+    </visual>
+  </link>  
+  <link name="y_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.00" ixy="0.0" ixz="0.0" iyy="0.00" iyz="0.0" izz="0.00"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.01 5 0.01"/>
+      </geometry>
+      <origin xyz="0.0 2.5 0" rpy="0 0.0 0.0"/>
+      <material name="green"/>
+    </visual>
+  </link>
+  <link name="minus_y_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.00" ixy="0.0" ixz="0.0" iyy="0.00" iyz="0.0" izz="0.00"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.01 5 0.01"/>
+      </geometry>
+      <origin xyz="0.0 -2.5 0" rpy="0 0.0 0.0"/>
+      <material name="minus_green"/>
+    </visual>
+  </link>  
+  <link name="z_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.00" ixy="0.0" ixz="0.0" iyy="0.00" iyz="0.0" izz="0.00"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 5"/>
+      </geometry>
+      <origin xyz="0.0 0.0 2.5" rpy="0 0.0 0.0"/>
+      <material name="blue"/>
+    </visual>
+  </link>  
+  <link name="minus_z_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.00" ixy="0.0" ixz="0.0" iyy="0.00" iyz="0.0" izz="0.00"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 5"/>
+      </geometry>
+      <origin xyz="0.0 0.0 -2.5" rpy="0 0.0 0.0"/>
+      <material name="minus_blue"/>
+    </visual>
+  </link>        
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+   <joint name="x_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="x_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+   <joint name="minus_x_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="minus_x_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>  
+   <joint name="y_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="y_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+   <joint name="minus_y_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="minus_y_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>  
+   <joint name="z_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="z_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>    
+   <joint name="minus_z_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="minus_z_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>      
+</robot>
+

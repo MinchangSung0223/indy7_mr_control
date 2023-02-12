@@ -28,7 +28,7 @@ class Indy7:
         self.p.setAdditionalSearchPath(pybullet_data.getDataPath())
         self.robotId = self.p.loadURDF(urdf_name, [0, 0, 0.0],[0, 0, 0, 1],flags=self.p.URDF_USE_SELF_COLLISION,useFixedBase=True)
         self.p.configureDebugVisualizer(self.p.COV_ENABLE_GUI,0)
-        self.p.resetDebugVisualizerCamera(2,90,-15,[0,0,0.5])
+        self.p.resetDebugVisualizerCamera(1.0,90,-15,[0,0,0.5])
         self.p.resetBasePositionAndOrientation(self.robotId, baseXYZ, self.p.getQuaternionFromEuler(baseRPY))
 
         self.active_joint_list,self.active_joint_num_list,self.eef_num=self.getActiveJointList(self.robotId)
@@ -43,6 +43,9 @@ class Indy7:
         self.data["Xd"]=[]
         self.data["Vb"]=[]
         self.data["Vd"]=[]
+        self.data["dVb"]=[]
+        self.data["dVd"]=[]
+        
         self.lineWidth = 4;
         self.x_lineId = p.addUserDebugLine(lineFromXYZ=[0, 0, 0],
                                     lineToXYZ=[0, 0, 0],
@@ -159,13 +162,15 @@ class Indy7:
     def applyForce(self,force):
         #self.p.applyExternalForce(self.robotId,self.eef_num,force,[0,0,0],self.p.WORLD_FRAME)
         self.p.applyExternalForce(self.robotId,self.eef_num,force,[0,0,0],self.p.LINK_FRAME)
-    def setData(self,t,q,T,Xd,Vb,Vd):
+    def setData(self,t,q,T,Xd,Vb,Vd,dVb,dVd):
         self.data["t"].append(t)
         self.data["q"].append(q.tolist())
         self.data["T"].append(T.tolist())
         self.data["Xd"].append(Xd.tolist())
         self.data["Vb"].append(Vb.tolist())
         self.data["Vd"].append(Vd.tolist())
+        self.data["dVb"].append(dVb.tolist())
+        self.data["dVd"].append(dVd.tolist())
     def saveData(self):
         with open("output.json", 'w') as outfile:
             json.dump(self.data, outfile)
@@ -189,6 +194,9 @@ class Indy7:
         Vd_list = np.array(data["Vd"])
         Vb_list = np.array(data["Vb"])
 
+        dVb_list = np.array(data["dVb"])
+        dVd_list = np.array(data["dVd"])
+
 
         #for i in range(0,12):
         #   plt.plot(t_list,q_rel_list[:,i])
@@ -201,24 +209,56 @@ class Indy7:
         plt.plot(t_list,T_z_list-Xd_z_list)
         plt.tight_layout()
         plt.figure()
-        plt.subplot(6,1,1)
-        plt.plot(t_list,Vd_list[:,0],'r:')
-        plt.plot(t_list,Vb_list[:,0])
-        plt.subplot(6,1,2)
-        plt.plot(t_list,Vd_list[:,1],'r:')
-        plt.plot(t_list,Vb_list[:,1])
-        plt.subplot(6,1,3)
-        plt.plot(t_list,Vd_list[:,2],'r:')
-        plt.plot(t_list,Vb_list[:,2])
-        plt.subplot(6,1,4)
-        plt.plot(t_list,Vd_list[:,3],'r:')
-        plt.plot(t_list,Vb_list[:,3])
-        plt.subplot(6,1,5)
-        plt.plot(t_list,Vd_list[:,4],'r:')
-        plt.plot(t_list,Vb_list[:,4])
-        plt.subplot(6,1,6)
-        plt.plot(t_list,Vd_list[:,5],'r:')
-        plt.plot(t_list,Vb_list[:,5])
+        ax=plt.subplot(2,3,1)
+        plt.plot(t_list,Vd_list[:,0],'r--')
+        plt.plot(t_list,Vb_list[:,0],'b:')
+        ax.set_title(r'$\omega_1$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,2)
+        plt.plot(t_list,Vd_list[:,1],'r--')
+        plt.plot(t_list,Vb_list[:,1],'b:')
+        ax.set_title(r'$\omega_2$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,3)
+        plt.plot(t_list,Vd_list[:,2],'r--')
+        plt.plot(t_list,Vb_list[:,2],'b:')
+        ax.set_title(r'$\omega_3$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,4)
+        plt.plot(t_list,Vd_list[:,3],'r--')
+        plt.plot(t_list,Vb_list[:,3],'b:')
+        ax.set_title(r'$\dot{p}_x$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,5)
+        plt.plot(t_list,Vd_list[:,4],'r--')
+        plt.plot(t_list,Vb_list[:,4],'b:')
+        ax.set_title(r'$\dot{p}_y$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,6)
+        plt.plot(t_list,Vd_list[:,5],'r--')
+        plt.plot(t_list,Vb_list[:,5],'b:')
+        ax.set_title(r'$\dot{p}_z$',fontsize='medium', usetex = True)
+        plt.tight_layout()        
+        plt.figure()
+        ax=plt.subplot(2,3,1)
+        plt.plot(t_list,dVd_list[:,0],'r--')
+        plt.plot(t_list,dVb_list[:,0],'b:')
+        ax.set_title(r'$\dot{\omega}_x$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,2)
+        plt.plot(t_list,dVd_list[:,1],'r--')
+        plt.plot(t_list,dVb_list[:,1],'b:')
+        ax.set_title(r'$\dot{\omega}_y$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,3)
+        plt.plot(t_list,dVd_list[:,2],'r--')
+        plt.plot(t_list,dVb_list[:,2],'b:')
+        ax.set_title(r'$\dot{\omega}_z$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,4)
+        plt.plot(t_list,dVd_list[:,3],'r--')
+        plt.plot(t_list,dVb_list[:,3],'b:')
+        ax.set_title(r'$\ddot{p}_x$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,5)
+        plt.plot(t_list,dVd_list[:,4],'r--')
+        plt.plot(t_list,dVb_list[:,4],'b:')
+        ax.set_title(r'$\ddot{p}_y$',fontsize='medium', usetex = True)
+        ax=plt.subplot(2,3,6)
+        plt.plot(t_list,dVd_list[:,5],'r--')
+        plt.plot(t_list,dVb_list[:,5],'b:')
+        ax.set_title(r'$\ddot{p}_z$',fontsize='medium', usetex = True)
         plt.tight_layout()        
         plt.show()    
     def drawT(self,T,lineWidth,x_lineId,y_lineId,z_lineId,scale):

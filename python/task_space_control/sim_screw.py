@@ -78,7 +78,7 @@ for t in np.arange(0,endTime,dt):
 	q,qdot = EulerStep(q,qdot,qddot,dt)
 	prevXd = Xd;
 	idx= idx+1
-	indy7.setData(t,q,T,Xd,diffXd/dt,Vb)
+	indy7.setData(t,q,T,Xd,diffXd/dt,dVb,dVd)
 	indy7.setJointStates(q)
 	indy7.drawEEF();
 	indy7.step()

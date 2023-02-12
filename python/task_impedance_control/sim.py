@@ -15,7 +15,8 @@ dt = 1/CONTROL_FREQ;
 urdf_name = "../../model/indy7.urdf"
 indy7 = Indy7(p,urdf_name = urdf_name, CONTROL_FREQ=CONTROL_FREQ)
 indy7.resetJointStates(np.array([ 0.   ,  -0.8893, -2.2512 , 0.0003, -0.0005 ,-0.0003]).T);
-p.loadURDF("plane.urdf")
+p.loadURDF("../../model/plane.urdf")
+p.loadURDF("../../model/axis.urdf")
 #--------------------------------------------
 ## Modern Robotics setup
 MR=loadURDF(urdf_name)
@@ -79,21 +80,21 @@ for t in np.arange(0,endTime,dt):
 	Js,Jb,Ja,pinvJs,pinvJb, pinvJa = indy7.getJacobian(M,Slist,Blist,q);
 	Jbdot = DerivativeJacobianBody_(Blist,q)
 	MassMat = MassMatrix(q,Mlist,Glist,Slist);
-	MassMat_nom = MassMatrix(q_nom,Mlist,Glist,Slist);
+	#MassMat_nom = MassMatrix(q_nom,Mlist,Glist,Slist);
 	
-	Coriolis =  VelQuadraticForces(q, qdot, Mlist, Glist, Slist)
-	Coriolis_nom =  VelQuadraticForces(q_nom, qdot_nom, Mlist, Glist, Slist)
+	#Coriolis =  VelQuadraticForces(q, qdot, Mlist, Glist, Slist)
+	#Coriolis_nom =  VelQuadraticForces(q_nom, qdot_nom, Mlist, Glist, Slist)
 	
-	tauGrav = GravityForces(q, g, Mlist, Glist, Slist);
-	tauGrav_nom = GravityForces(q_nom, g, Mlist, Glist, Slist);
+	#tauGrav = GravityForces(q, g, Mlist, Glist, Slist);
+	#tauGrav_nom = GravityForces(q_nom, g, Mlist, Glist, Slist);
 
 	H = InverseDynamics(q, qdot, qddot, g, Ftip, Mlist, \
                     Glist, Slist)
 
-	indy7.applyForce([0,0,-100])
+	#indy7.applyForce([0,0,-100])
 	tauExt  = indy7.getFT();
-	print(tauExt)
-	tauImp = computeImpedanceControlTorq(des_pos,des_vel, q, qdot,Xe,pinvJb)
+	#print(tauExt)
+	#tauImp = computeImpedanceControlTorq(des_pos,des_vel, q, qdot,Xe,pinvJb)
 	qddot_nom = np.array([0,0,0,0,0,0]).T
 	#qddot_nom = np.linalg.inv(MassMat_nom)@(-(Coriolis_nom)+K.dot(tauImp+tauExt))
 	q_nom,qdot_nom = EulerStep(q_nom,qdot_nom,qddot_nom,dt)
@@ -107,7 +108,7 @@ for t in np.arange(0,endTime,dt):
 	#Xe[0:3] = Xe[0:3] /30.0
 	#Vb[0:3] = Vb[0:3] /30.0
 	torques = Jb.T @ (Lambda@(Xe*500.0-150.0*Vb)+tauExt)+H
-	print(torques)
+	#print(torques)
 	indy7.setTorques(torques)
 	#indy7.setJointStates(des_q)
 

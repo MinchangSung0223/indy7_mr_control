@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<robot name="axis">
+  <link name="world"/>
+  <link name="x_link">
+    <visual>
+      <origin rpy="0 1.5708 0" xyz="0.75 0 0"/>
+      <geometry>
+				<cylinder radius="0.002" length="1.5"/>
+      </geometry>
+       <material name="red">
+        <color rgba="1 0.0 0 1"/>
+      </material>
+    </visual>
+  </link>
+  <link name="y_link">
+    <visual>
+      <origin rpy="1.5708 0 0" xyz="0 0.75 0"/>
+      <geometry>
+        <cylinder radius="0.002" length="1.5"/>
+      </geometry>
+       <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+    </visual>
+  </link>
+      <link name="z_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0  0.75 "/>
+      <geometry>
+        <cylinder radius="0.002" length="1.5"/>
+      </geometry>
+       <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+    </visual>
+  </link>
+ <joint name="x_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="world"/>
+    <child link="x_link"/>
+ </joint>
+ <joint name="y_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="world"/>
+    <child link="y_link"/>
+ </joint>
+   <joint name="z_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="world"/>
+    <child link="z_link"/>
+ </joint>
+</robot>
