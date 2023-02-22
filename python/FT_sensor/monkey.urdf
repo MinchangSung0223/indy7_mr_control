@@ -36,14 +36,14 @@
 		<visual>
 			<origin rpy="0 0 0" xyz="0 0 0.0"/>
 			<geometry>
-        <mesh filename="cylinder.stl"/>
+        <mesh filename="monkey.stl"/>
 			</geometry>
 		<material name="red"/>
 		</visual>
 		<collision>
 			<origin rpy="0 0 0" xyz="0 0 0.0"/>
 			<geometry>
-        <mesh filename="cylinder.stl"/>
+        <mesh filename="monkey.stl"/>
 			</geometry>
 		</collision>
 	</link>	
